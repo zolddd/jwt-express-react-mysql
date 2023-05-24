@@ -1,15 +1,20 @@
 import jwt from "jsonwebtoken";
 import SECRET from "../SECRET";
 import { createNewUser,getUserByEmail,comparePassword } from "./user.controller";
+import { sendMail } from "../config/emailer";
 import { createRoles } from "./role.controller";
 export const signUp=async(req,res)=>{
   //registra usuarios
     const {email,password}=req.body;
+    let user={
+      email:email
+    }
     const idUser= await createNewUser(email,password);  
     let permissionsUser= createRoles(0,1,1,idUser)
     const token= jwt.sign({id:idUser},SECRET.SECRET,{
       expiresIn:86400 //24 hrs
     })
+    sendMail(user)
     
   res.json({token});
 }
